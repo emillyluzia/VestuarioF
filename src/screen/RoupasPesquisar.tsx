@@ -1,9 +1,11 @@
-import React from "react";
-import { FlatList, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Head from "../components/Head";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Footer from "../components/Footer";
 
-interface Produto {
+interface Roupas {
     id: number;
     tecido: string;
     tamanho: string;
@@ -14,42 +16,36 @@ interface Produto {
     descricao: string;
 }
 
-function PesquisaRoupas(): React.JSX.Element {
+function RoupasPesquisar(): React.JSX.Element {
+    const [roupas, setRoupas] = useState<any[]>([]);
+    const [pesquisa, setPesquisa] = useState<string>("");
 
     const navigation = useNavigation();
 
-    const produtos: Produto[] = [
-        {
-            id: 1,
-            tecido: 'Algodão',
-            tamanho: 'M',
-            cor: 'Roxo',
-            categoria: 'Adulto',
-            fabricacao: 'China',
-            estacao: 'Inverno',
-            descricao: 'Roupa super quentinha',
-        },
-        {
-            id: 2,
-            tecido: 'Algodão',
-            tamanho: 'G',
-            cor: 'Rosa',
-            categoria: 'Kids',
-            fabricacao: 'Brasil',
-            estacao: 'Calor',
-            descricao: 'Roupa super confortável',
-        },
-    ]
+    useEffect(() => {
+        pesquisarRoupas();
+    }, [])
 
-    const selecionaProduto = (produto: Produto) => {
-        navigation.navigate('EditarProdutos', { produto });
+    const pesquisarRoupas = async () => {
+
+        try {
+            if (pesquisa != "") {
+                const response = await axios.get('http://10.137.11.202:8000/api/pesquisaCategoria/' + pesquisa);
+                setRoupas(response.data.data);
+            } else {
+                const response = await axios.get('http://10.137.11.202/vestuario/public/api/vizualizar');
+                setRoupas(response.data.dados);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 
-    const renderItem = ({ item }: {item: Produto }) => {
+    const renderItem = ({ item }: { item: Roupas }) => {
         return (
-            <TouchableOpacity style={styles.menuItem}
-             onPress={() => selecionaProduto(item)}>
+            <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.itemDetails}>
                     <Text style={styles.tissue}>{item.tecido}</Text>
                     <Text style={styles.size}>{item.tamanho}</Text>
@@ -60,20 +56,25 @@ function PesquisaRoupas(): React.JSX.Element {
                 </View>
             </TouchableOpacity>
         );
+
+        <Footer />
     }
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor={'red'} barStyle={'light-content'}/>
-            <Head/>
+            <StatusBar backgroundColor={'red'} barStyle={'light-content'} />
+            <Head />
             <FlatList
-               data={produtos}
-               renderItem={renderItem}
-               keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
-               contentContainerStyle={styles.menuList}
-               />
+                data={roupas}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={styles.menuList}
+            />
+
+            <Footer />
         </View>
     );
+
 }
 
 const styles = StyleSheet.create({
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
         borderRadius: 5
     },
-    itemDetails:{
+    itemDetails: {
         marginLeft: 10,
         flex: 1,
     },
@@ -128,9 +129,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold'
     },
-    menuList:{
+    menuList: {
         flexGrow: 1
     }
 })
 
-export default PesquisaRoupas;
+export default RoupasPesquisar;
