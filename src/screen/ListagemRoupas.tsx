@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {  FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
+import { TextInput } from 'react-native-gesture-handler';
 
 
 interface Roupas {
@@ -13,29 +14,16 @@ interface Roupas {
     fabricacao: string;
     estacao: string;
     descricao: string;
+    
 }
 
-
-
-const renderItem = ({ item }: { item: Roupas }) => (
-    <TouchableOpacity style={styles.item}>
-        <Text style={styles.Texto1}>{item.tecido}</Text>
-        <Text style={styles.Texto1}>{item.tamanho}</Text>
-        <Text style={styles.Texto1}>{item.cor}</Text>
-        <Text style={styles.Texto1}>{item.categoria}</Text>
-        <Text style={styles.Texto1}>{item.fabricacao}</Text>
-        <Text style={styles.Texto1}>{item.estacao}</Text>
-       
-
-        
-    </TouchableOpacity>
-);
 
 
 function ListagemRoupas(): React.JSX.Element {
 
     const [roupas, setRoupas] = useState<Produto[]>([]);
-
+    const [pesquisa, setPesquisa] = useState<string>('');
+    const [filteredRoupas, setFilteredRoupas] = useState<Roupas[]>(roupas);
 
     useEffect(() => {
         ListagemRoupas();
@@ -55,23 +43,61 @@ function ListagemRoupas(): React.JSX.Element {
         }
     }
 
+    const handleDelete = async (id: number) => {
+        try {
+          await axios.delete('http://10.137.11.202:8000/api/excluir/'+id);
+          setRoupas(roupas.filter((roupa) => roupa.id !== id));
+          setFilteredRoupas(filteredRoupas.filter((roupa) => roupa.id !== id));
+        } catch (error) {
+      
+        }
+      };
+
     const navigation= useNavigation();
 
+    const renderItem = ({ item }: { item: Roupas }) => {
+        return (
+          <View style={styles.container}>
+             <Text style={styles.Texto1}>{item.tecido}</Text>
+            <Text style={styles.Texto1}>{item.tamanho}</Text>
+            <Text style={styles.Texto1}>{item.cor}</Text>
+            <Text style={styles.Texto1}>{item.categoria}</Text>
+            <Text style={styles.Texto1}>{item.fabricacao}</Text>
+            <Text style={styles.Texto1}>{item.estacao}</Text>
+            <View style={styles.botaoContainer}>
+              <TouchableOpacity style={styles.botaoDeletar} onPress={() => handleDelete(item.id)}>
+                <Text style={styles.botaoText}>Deletar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botaoEditar} onPress={() => navigation.navigate('Editar')}>
+                <Text style={styles.botaoText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      };
+    
+
+      
     return (
+        
         <View style={styles.container}>
            
             <View style={styles.header}>
                 <Text style={styles.headerText} >Ame Fashion</Text>
                 <Text style={styles.Textocima}></Text>
             </View>
+            <TextInput
+          style={styles.searchInput}
+          placeholder="Pesquisar..."
+          value={pesquisa}
+          onChangeText={(text) => setPesquisa(text)}
+        />
             <FlatList
                 data={roupas}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
 
             />
-            
-
 
 
         </View>
@@ -85,6 +111,56 @@ const styles = StyleSheet.create({
 
 
     },
+    botaoText: {
+        fontSize: 16,
+        color: '#fff',
+        textAlign: 'center',
+      },
+      searchInput: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        marginHorizontal: 20,
+      },
+      searchBar: {
+        backgroundColor: 'white',
+        elevation: 5,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 2,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginBottom: 5,
+      },
+        botaoDeletar: {
+        backgroundColor: 'red',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        height: 42,
+        width: '49%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      botaoEditar: {
+        backgroundColor: 'blue',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        height: 42,
+        width: '49%', 
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      botaoContainer: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+      },
     item: {
         backgroundColor: '#FF1493',
         padding: 20,
@@ -145,8 +221,21 @@ const styles = StyleSheet.create({
     Textocima:{
         fontSize:20,
         color: 'white'
+    },
+    pesquisa:{
+        borderWidth:5,
+        borderColor:'black',
+        borderRadius:10
+    },
+    buttonPesquisar:{
+        padding:10,
+        width:15,
+        height:10,
+        position:'absolute',
+        marginTop:105,
+        marginLeft:350,
+        backgroundColor:'red'
     }
-    
 })
 
 export default ListagemRoupas;
