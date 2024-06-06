@@ -12,7 +12,9 @@ function App(): React.ReactElement {
   return (
     <NavigationContainer>
        <Stack.Navigator>
-        <Stack.Screen name='Roupas' component={ListagemRoupas} options={{ headerShown: false }} />
+        <Stack.Screen name='Listagem' component={ListagemRoupas} options={{ headerShown: false }} />
+        <Stack.Screen name='Cadastro' component={CadastroScreen} options={{ headerShown: false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
 

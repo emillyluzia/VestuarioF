@@ -9,20 +9,12 @@ function Footer(): React.JSX.Element {
 
     return (
         <View style={styles.footer}>
-            <TouchableOpacity  style={styles.button} onPress={()=>navigation.navigate('Home')}>
+            <TouchableOpacity  style={styles.button} onPress={()=>navigation.navigate('Cadastro')}>
                 <Image source={require('../assets/images/casa.png')}
-                style={styles.footericon}/>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('Pesquisar')} >
-                <Image source={require('../assets/images/pesquisa.png')}
                 style={styles.footericon}/>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('Listagem')}>
                 <Image source={require('../assets/images/barra.png')}
-                style={styles.footericon}/>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('Profile')}>
-                <Image source={require('../assets/images/usuario.png')}
                 style={styles.footericon}/>
             </TouchableOpacity>
         </View>

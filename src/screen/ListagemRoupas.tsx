@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {  FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { TextInput } from 'react-native-gesture-handler';
+import Footer from '../components/Footer';
 
 
 interface Roupas {
@@ -26,10 +27,27 @@ function ListagemRoupas(): React.JSX.Element {
     const [filteredRoupas, setFilteredRoupas] = useState<Roupas[]>(roupas);
 
     useEffect(() => {
+      if(pesquisa == ""){
         ListagemRoupas();
+      }
     }, []);
 
+    const buscar = async () => {
 
+      try {
+          const response = await axios.get('http://10.137.11.202:8000/api/pesquisaCategoria/' + pesquisa);
+          console.log('buscando roupas')
+          setRoupas(response.data.data)
+          console.log(roupas)
+          if (response.data.status === true) {
+
+          } else {
+              console.log('Erro na busca:', response.data.message);
+          }
+      } catch (error) {
+          console.log('Erro na requisição:', error);
+      }
+  };
     const ListagemRoupas = async () => {
         try {
             const response = await axios.get('http://10.137.11.202:8000/api/vizualizar');
@@ -68,9 +86,6 @@ function ListagemRoupas(): React.JSX.Element {
               <TouchableOpacity style={styles.botaoDeletar} onPress={() => handleDelete(item.id)}>
                 <Text style={styles.botaoText}>Deletar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botaoEditar} onPress={() => navigation.navigate('Editar')}>
-                <Text style={styles.botaoText}>Editar</Text>
-              </TouchableOpacity>
             </View>
           </View>
         );
@@ -92,6 +107,7 @@ function ListagemRoupas(): React.JSX.Element {
           value={pesquisa}
           onChangeText={(text) => setPesquisa(text)}
         />
+        <TouchableOpacity style={styles.Pesquisa} onPress={() => buscar()}><Text>Pesquisar</Text></TouchableOpacity>
             <FlatList
                 data={roupas}
                 renderItem={renderItem}
@@ -99,7 +115,7 @@ function ListagemRoupas(): React.JSX.Element {
 
             />
 
-
+          <Footer/>
         </View>
     );
 
@@ -112,10 +128,20 @@ const styles = StyleSheet.create({
 
     },
     botaoText: {
-        fontSize: 16,
+        fontSize: 18,
         color: '#fff',
         textAlign: 'center',
       },
+      Pesquisa: {
+        padding: 12,
+        backgroundColor: '#43ec5f',
+        width: 18,
+        height: 15,
+        position: 'absolute',
+        top: 100,
+        right: 30,
+        borderRadius: 20,
+    },
       searchInput: {
         height: 40,
         borderColor: 'gray',

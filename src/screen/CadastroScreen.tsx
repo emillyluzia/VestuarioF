@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import {StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Footer from '../components/Footer';
 function CadastroScreen():JSX.Element{
 
 
@@ -32,6 +33,7 @@ console.log(formData)
                 'Content-Type':'multipart/form-data'
             }
          });
+         console.log(response.data)
 
         }catch(error){
             console.log(error);
@@ -77,7 +79,7 @@ console.log(formData)
                     <Text style={styles.buttonText}>Cadastrar</Text>
                 </TouchableOpacity>
             </View>
-
+               <Footer/>
         </View>
 
     
